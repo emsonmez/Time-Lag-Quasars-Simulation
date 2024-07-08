@@ -3,17 +3,16 @@ import numpy as np
 from scipy.optimize import curve_fit
 from scipy import integrate
 
+
 class GoodnessOfFit(object):
-    """
-    A class to perform goodness-of-fit analysis for quasar observational data.
+    """A class to perform goodness-of-fit analysis for quasar observational data.
 
     :param base_dir: Base directory of the project.
     :type base_dir: str
     """
 
     def __init__(self, base_dir):
-        """
-        Initializes the GoodnessOfFit class with the base directory.
+        """Initializes the GoodnessOfFit class with the base directory.
 
         :param base_dir: Base directory of the project.
         :type base_dir: str
@@ -25,7 +24,7 @@ class GoodnessOfFit(object):
 
         self.log_L_1350_norm = self.data_loader.log_L_1350 - np.log10(1e44)
         self.log_𝜏 = self.data_loader.log_𝜏
-        self.log_𝜏_3000 = self.data_loader.log_𝜏_3000 
+        self.log_𝜏_3000 = self.data_loader.log_𝜏_3000
 
         c = 299792.458  # speed of light; km/s
         Om = 0.3
@@ -41,7 +40,7 @@ class GoodnessOfFit(object):
             d_c, _ = integrate.quad(integrand_vec, 0, z, args=(H0, Om))
             return (1 + z) * d_c * c
 
-        z_3000 = self.data_loader.z_3000  
+        z_3000 = self.data_loader.z_3000
         dL_3000_Mpc = np.array([d_L(z, Om, H0) for z in z_3000])
 
         conversion_factor = 3.08567758e24  # 1 Mpc = 3.08567758 × 10^24 cm
@@ -61,23 +60,7 @@ class GoodnessOfFit(object):
         self.gamma_std_3000 = None
 
     def power_law_model(self, x, beta, gamma):
-        """
-        Defines the power-law model function.
-
-        :param x: Independent variable (normalized log luminosity).
-        :type x: np.ndarray
-        :param beta: Intercept parameter.
-        :type beta: float
-        :param gamma: Slope parameter.
-        :type gamma: float
-        :return: Predicted values using the power-law model.
-        :rtype: np.ndarray
-        """
-        return beta + gamma * x
-
-    def power_law_model(self, x, beta, gamma):
-        """
-        Defines the power-law model function.
+        """Defines the power-law model function.
 
         :param x: Independent variable (normalized log luminosity).
         :type x: np.ndarray
@@ -91,9 +74,8 @@ class GoodnessOfFit(object):
         return beta + gamma * x
 
     def fit_curve(self):
-        """
-        Performs curve fitting using the power-law model and stores the results internally.
-        """
+        """Performs curve fitting using the power-law model and stores the results
+        internally."""
         # Fit C IV data
         popt_1350, pcov_1350 = curve_fit(self.power_law_model, self.log_L_1350_norm, self.log_τ)
         self.beta_1350, self.gamma_1350 = popt_1350
@@ -132,20 +114,12 @@ class GoodnessOfFit(object):
         degrees_of_freedom_3000 = N_3000 - 2
 
         return {
-            "C IV": {
-                "intrinsic_scatter": intrinsic_scatter_1350,
-                "degrees_of_freedom": degrees_of_freedom_1350
-            },
-            "Mg II": {
-                "intrinsic_scatter": intrinsic_scatter_3000,
-                "degrees_of_freedom": degrees_of_freedom_3000
-            }
+            "C IV": {"intrinsic_scatter": intrinsic_scatter_1350, "degrees_of_freedom": degrees_of_freedom_1350},
+            "Mg II": {"intrinsic_scatter": intrinsic_scatter_3000, "degrees_of_freedom": degrees_of_freedom_3000},
         }
 
     def print_results(self):
-        """
-        Prints the estimated parameters and goodness of fit metrics.
-        """
+        """Prints the estimated parameters and goodness of fit metrics."""
         if self.beta_1350 is None or self.beta_3000 is None:
             self.fit_curve()
 
@@ -162,17 +136,3 @@ class GoodnessOfFit(object):
         print("gamma = {:.2f} +/- {:.2f}".format(self.gamma_3000, self.gamma_std_3000))
         print("Intrinsic scatter = {:.2f}".format(goodness_of_fit["Mg II"]["intrinsic_scatter"]))
         print("Degrees of freedom = {}".format(goodness_of_fit["Mg II"]["degrees_of_freedom"]))
-
-
-# Example usage:
-if __name__ == "__main__":
-    base_dir = "/path/to/your/project"
-    analysis = GoodnessOfFit(base_dir)
-    analysis.print_results()
-
-
-# Example usage:
-if __name__ == "__main__":
-    base_dir = "/path/to/your/project"
-    analysis = GoodnessOfFit(base_dir)
-    analysis.print_results()

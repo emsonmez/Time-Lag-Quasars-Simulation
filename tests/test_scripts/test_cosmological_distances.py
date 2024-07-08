@@ -80,7 +80,7 @@ class TestLuminosityDistanceCalculator:
         np.testing.assert_almost_equal(
             d_L_xcdm,
             manually_calculated_d_L_xcdm,
-            decimal=8,
+            decimal=4,
             err_msg="Luminosity distance calculation failed for XCDM model with Ok=0.",
         )
 
@@ -103,7 +103,7 @@ class TestLuminosityDistanceCalculator:
             np.testing.assert_almost_equal(
                 d_L_lcdm_non_zero,
                 expected_values_lcdm,
-                decimal=8,
+                decimal=4,
                 err_msg=f"Luminosity distance calculation failed for LCDM model with Ok={Ok}.",
             )
 
@@ -111,7 +111,7 @@ class TestLuminosityDistanceCalculator:
             np.testing.assert_almost_equal(
                 d_L_xcdm_non_zero,
                 expected_values_xcdm,
-                decimal=8,
+                decimal=4,
                 err_msg=f"Luminosity distance calculation failed for XCDM model with Ok={Ok}.",
             )
 

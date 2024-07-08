@@ -1,28 +1,29 @@
 import numpy as np
 
-class LuminosityDistanceCalculator(object):
-    """
-    A class to perform all necessary cosmological distances formulas, taking into account all models.
-    """
-    
-    def __init__(self, H0: float = 70, c: float = 299792.458, conversion_factor: float = 3.08567758e24):
-       """
-        Initializes the LuminosityDistanceCalculator class with cosmological constants.
 
-        :param H0: Hubble constant (current expansion rate of the universe) :unit: km/s/Mpc
+class LuminosityDistanceCalculator(object):
+    """A class to perform all necessary cosmological distances formulas, taking into
+    account all models."""
+
+    def __init__(self, H0: float = 70, c: float = 299792.458, conversion_factor: float = 3.08567758e24):
+        """Initializes the LuminosityDistanceCalculator class with cosmological
+        constants.
+
+        :param H0: Hubble constant (current expansion rate of the universe) :unit:
+            km/s/Mpc
         :type H0: float
         :param c: Speed of light :unit: km/s
         :type c: float
-        :param conversion_factor: Conversion rate bewteen Megaparsecs (Mpc) and centimeters (cm) :unit: cm/Mpc
+        :param conversion_factor: Conversion rate bewteen Megaparsecs (Mpc) and
+            centimeters (cm) :unit: cm/Mpc
         """
-       self.H0 = H0
-       self.c = c
-       self.conversion_factor = conversion_factor
+        self.H0 = H0
+        self.c = c
+        self.conversion_factor = conversion_factor
 
     @staticmethod
     def integrand_lcdm(z, Om, Ok, H0):
-       """
-        Integrand function for Lambda-CDM model.
+        """Integrand function for Lambda-CDM model.
 
         :param z: Redshift
         :type z: float
@@ -35,16 +36,15 @@ class LuminosityDistanceCalculator(object):
         :return: Integrand value
         :rtype: float
         """
-       Ol = 1 - Om - Ok
-       if Ok != 0:
+        Ol = 1 - Om - Ok
+        if Ok != 0:
             return 1 / (H0 * np.sqrt(Om * (1 + z) ** 3 + Ok * (1 + z) ** 2 + Ol))
-       else:
+        else:
             return 1 / (H0 * np.sqrt(Om * (1 + z) ** 3 + Ol))
-       
+
     @staticmethod
     def integrand_xcdm(z, Om, Ok, H0, w_x):
-        """
-        Integrand function for X-CDM model.
+        """Integrand function for X-CDM model.
 
         :param z: Redshift
         :type z: float
@@ -64,10 +64,10 @@ class LuminosityDistanceCalculator(object):
             return 1 / (H0 * np.sqrt(Om * (1 + z) ** 3 + Ok * (1 + z) ** 2 + Ox * (1 + z) ** (3 * (1 + w_x))))
         else:
             return 1 / (H0 * np.sqrt(Om * (1 + z) ** 3 + Ox * (1 + z) ** (3 * (1 + w_x))))
-    
-    def d_L(self, z, Om, Ok, model='lcdm', w_x=-1):
-        """
-        Calculate the luminosity distance for given redshift values and cosmological parameters.
+
+    def d_L(self, z, Om, Ok, model="lcdm", w_x=-1):
+        """Calculate the luminosity distance for given redshift values and cosmological
+        parameters.
 
         :param z: Array of redshift values
         :type z: np.ndarray
@@ -85,10 +85,10 @@ class LuminosityDistanceCalculator(object):
         num_points = len(z)
         integral_values = np.zeros(num_points)
 
-        if model == 'lcdm':
+        if model == "lcdm":
             integrand_func = self.integrand_lcdm
             args = (Om, Ok, self.H0)
-        elif model == 'xcdm':
+        elif model == "xcdm":
             integrand_func = self.integrand_xcdm
             args = (Om, Ok, self.H0, w_x)
         else:

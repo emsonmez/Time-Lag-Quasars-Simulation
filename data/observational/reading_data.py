@@ -2,16 +2,16 @@ import os
 import numpy as np
 import re
 
+
 class ObsQuasarData:
-    """
-    A class to read and process quasar observational data from specified files.
+    """A class to read and process quasar observational data from specified files.
 
     :param base_dir: Base directory of the project.
     :type base_dir: str
     """
+
     def __init__(self, base_dir):
-        """
-        Initializes the ObsQuasarData class with the base directory.
+        """Initializes the ObsQuasarData class with the base directory.
 
         :param base_dir: Base directory of the project.
         :type base_dir: str
@@ -23,8 +23,7 @@ class ObsQuasarData:
         self.mgii_file_path = self.get_file_path("data/observational/MgII_Khadka_et_al_2021.txt")
 
     def get_file_path(self, relative_path):
-        """
-        Constructs the dynamic path to the data file.
+        """Constructs the dynamic path to the data file.
 
         :param relative_path: Relative path to the data file.
         :type relative_path: str
@@ -33,15 +32,15 @@ class ObsQuasarData:
         """
         base_path = os.path.dirname(__file__)
         return base_path.replace(base_path, relative_path)
-    
+
     def load_data(self):
         """Loads the C IV and Mg II data from the specified files."""
         self.civ_data = self.load_file(self.civ_file_path, expected_columns=9)
         self.mgii_data = self.load_file(self.mgii_file_path, expected_columns=7)
 
     def load_file(self, file_path, expected_columns):
-        """
-        Loads data from a specified file, excluding lines with incorrect number of columns.
+        """Loads data from a specified file, excluding lines with incorrect number of
+        columns.
 
         :param file_path: Path to the data file.
         :type file_path: str
@@ -50,27 +49,27 @@ class ObsQuasarData:
         :return: Processed data.
         :rtype: list of lists
         """
-        with open(file_path, 'r', encoding='utf-8') as file:
+        with open(file_path, "r", encoding="utf-8") as file:
             lines = file.readlines()
-        
+
         lines = lines[1:]  # Omitting the title names in the .txt file
         data = []
 
         for line in lines:
-            raw_values = re.split(r'\s+', line.strip())
+            raw_values = re.split(r"\s+", line.strip())
             values = [val for val in raw_values if val]  # Filter out any empty strings
 
             if len(values) == expected_columns:
                 data.append(values)  # Append all columns, including the first column
             else:
                 print(f"Ignoring line with incorrect number of values: {line.strip()}")
-        
+
         if not data:
             print(f"No valid data found in the file: {file_path}")
             exit()
 
         return data
-    
+
     def process_data(self):
         """Processes the loaded C IV and Mg II data."""
         self.process_civ_data()
@@ -109,8 +108,8 @@ class ObsQuasarData:
         self.log_σ_Upper_3000 = np.log10(np.abs(np.array(self.σ_Upper3000, dtype=np.float64)))
 
     def convert_to_float_array(self, data):
-        """
-        Converts a list of string values to a numpy array of floats, handling 'None' values.
+        """Converts a list of string values to a numpy array of floats, handling 'None'
+        values.
 
         :param data: List of string values.
         :type data: list of str
@@ -120,15 +119,14 @@ class ObsQuasarData:
         return np.vectorize(self.convert_float)(data)
 
     def convert_float(self, value):
-        """
-        Converts a string value to float, handling 'None' values.
+        """Converts a string value to float, handling 'None' values.
 
         :param value: String value.
         :type value: str
         :return: Float value.
         :rtype: float
         """
-        if value == 'None':
+        if value == "None":
             return np.nan
         else:
-            return float(value.replace('−', '-'))
+            return float(value.replace("−", "-"))
