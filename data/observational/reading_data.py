@@ -4,7 +4,7 @@ import re
 
 class ObsQuasarData:
     """
-    A class to read and process quasar observational data.
+    A class to read and process quasar observational data from specified files.
 
     :param base_dir: Base directory of the project.
     :type base_dir: str

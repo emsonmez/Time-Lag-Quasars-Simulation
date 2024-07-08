@@ -192,3 +192,7 @@ class TestObsQuasarData:
 
         with pytest.raises(ValueError):
             self.quasar_data.convert_float('invalid')
+
+# Running the tests with pytest
+if __name__ == "__main__":
+    pytest.main()
