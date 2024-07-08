@@ -66,32 +66,34 @@ class TestLuminosityDistanceCalculator:
 
     def test_d_L(self):
         manually_calculated_d_L_lcdm = np.array([8.741533562e27, 1.439537185e29])
-        manually_calculated_d_L_xcdm = np.array([8.023355001e27, 1.270613285e29])  # Replace with your actual values for XCDM
+        manually_calculated_d_L_xcdm = np.array([8.023355001e27, 1.270613285e29])
 
         d_L_lcdm = self.calculator.d_L(self.z_values, self.Om, self.Ok_zero, model="lcdm")
-        np.testing.assert_almost_equal(
+        np.testing.assert_allclose(
             d_L_lcdm,
             manually_calculated_d_L_lcdm,
-            decimal=4,
+            rtol=1e-5,
+            atol=1e-8,
             err_msg="Luminosity distance calculation failed for LCDM model with Ok=0.",
         )
 
         d_L_xcdm = self.calculator.d_L(self.z_values, self.Om, self.Ok_zero, model="xcdm", w_x=self.w_x)
-        np.testing.assert_almost_equal(
+        np.testing.assert_allclose(
             d_L_xcdm,
             manually_calculated_d_L_xcdm,
-            decimal=4,
+            rtol=1e-5,
+            atol=1e-8,
             err_msg="Luminosity distance calculation failed for XCDM model with Ok=0.",
         )
 
         Ok_values = [0.1, -0.1]
         manually_calculated_d_L_lcdm_non_zero = [
-            np.array([]),  # Replace with actual values for Ok = 0.1
-            np.array([]),  # Replace with actual values for Ok = -0.1
+            np.array([8.601372684e27, 1.462109104e29]),
+            np.array([8.89168158e27, 1.408572019e29]),
         ]
         manually_calculated_d_L_xcdm_non_zero = [
-            np.array([]),  # Replace with actual values for Ok = 0.1
-            np.array([]),  # Replace with actual values for Ok = -0.1
+            np.array([8.007589749e27, 1.308781633e29]),
+            np.array([8.039233256e27, 1.230554137e29]),
         ]
 
         for Ok, expected_values_lcdm, expected_values_xcdm in zip(
@@ -100,20 +102,25 @@ class TestLuminosityDistanceCalculator:
             manually_calculated_d_L_xcdm_non_zero,
         ):
             d_L_lcdm_non_zero = self.calculator.d_L(self.z_values, self.Om, Ok, model="lcdm")
-            np.testing.assert_almost_equal(
+            np.testing.assert_allclose(
                 d_L_lcdm_non_zero,
                 expected_values_lcdm,
-                decimal=4,
+                rtol=1e-5,
+                atol=1e-8,
                 err_msg=f"Luminosity distance calculation failed for LCDM model with Ok={Ok}.",
             )
 
             d_L_xcdm_non_zero = self.calculator.d_L(self.z_values, self.Om, Ok, model="xcdm", w_x=self.w_x)
-            np.testing.assert_almost_equal(
+            np.testing.assert_allclose(
                 d_L_xcdm_non_zero,
                 expected_values_xcdm,
-                decimal=4,
+                rtol=1e-5,
+                atol=1e-8,
                 err_msg=f"Luminosity distance calculation failed for XCDM model with Ok={Ok}.",
             )
+
+        with pytest.raises(ValueError, match="Model must be 'lcdm' or 'xcdm'"):
+            self.calculator.d_L(self.z_values, self.Om, self.Ok_zero, model="invalid_model")
 
 
 # Running the tests with pytest
