@@ -1,0 +1,26 @@
+coverage:
+  status:
+    project:
+      default:
+        target: 95% # Set your desired target percentage here
+        threshold: 1% # Set the allowed decrease in coverage here
+        paths:
+          - "src/*" # Define the paths to include in the project status
+    patch:
+      default:
+        target: 80% # Set your desired target percentage here
+        threshold: 0.5% # Set the allowed decrease in patch coverage here
+        paths:
+          - "src/*" # Define the paths to include in the patch status
+parsers:
+  gcov:
+    branch_detection:
+      conditional: yes
+      loop: yes
+      method: no
+      macro: no
+
+comment:
+  layout: "reach,diff,flags,files,footer"
+  require_changes: true # Only post a comment if there are changes in coverage
+  require_base: yes # Only post a comment if the base report has coverage data
