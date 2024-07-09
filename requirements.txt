@@ -1,7 +1,10 @@
 codecov
 flake8
 numpy
+patch
 pre-commit
+project
 pytest
 pytest-cov
+pytest-mock
 scipy
