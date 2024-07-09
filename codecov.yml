@@ -2,14 +2,14 @@ coverage:
   status:
     project:
       default:
-        target: 95% # Set your desired target percentage here
-        threshold: 1% # Set the allowed decrease in coverage here
+        target: 95%
+        threshold: 1%
         paths:
-          - "src/*" # Define the paths to include in the project status
+          - "src/*"
     patch:
       default:
-        target: 80% # Set your desired target percentage here
-        threshold: 0.5% # Set the allowed decrease in patch coverage here
+        target: 95% #
+        threshold: 1%
         paths:
           - "src/*" # Define the paths to include in the patch status
 parsers:
