@@ -4,6 +4,4 @@ numpy
 pre-commit
 pytest
 pytest-cov
-re
 scipy
-unittest
