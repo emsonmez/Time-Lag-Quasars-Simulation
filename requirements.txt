@@ -2,7 +2,6 @@ codecov
 flake8
 numpy
 patch
-project
 pytest
 pytest-cov
 pytest-mock
