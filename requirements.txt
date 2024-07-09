@@ -1,6 +1,5 @@
 codecov
 flake8
-io
 numpy
 pre-commit
 pytest
