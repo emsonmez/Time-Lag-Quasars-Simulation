@@ -34,11 +34,9 @@ jobs:
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
-          directory: ./coverage/reports/
-          env_vars: OS,PYTHON
-          fail_ci_if_error: true
-          files: ./coverage1.xml,./coverage2.xml,!./cache
+          files: coverage.xml
           flags: unittests
           name: codecov-umbrella
+          fail_ci_if_error: true
           token: 64e07b1e-4dc9-4362-a9e9-9cb25691ee58
           verbose: true
