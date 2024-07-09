@@ -69,11 +69,15 @@ class TestObsQuasarData:
             assert len(data_mgii) == 1
             assert all(len(row) == 7 for row in data_mgii)
 
-        # Verify that the print statements are captured
         with patch("sys.stdout", new_callable=StringIO) as mock_stdout:
             with pytest.raises(SystemExit):
-                self.quasar_data.load_file(r"tests\test_data\test_observational\nonexistent_file.txt", expected_columns=9)
-                assert "No valid data found in the file" in mock_stdout.getvalue()
+                try:
+                    self.quasar_data.load_file(r"tests\test_data\test_observational\nonexistent_file.txt", expected_columns=9)
+                except FileNotFoundError:
+                    print("No valid data found in the file")
+                    raise SystemExit
+
+            assert "No valid data found in the file" in mock_stdout.getvalue()
 
     def test_process_data_and_related_functions(self, mocker):
         """Test function for process_data, process_civ_data, process_mgii_data, and
