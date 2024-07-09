@@ -2,7 +2,6 @@ codecov
 flake8
 io
 numpy
-os
 pre-commit
 pytest
 pytest-cov
