@@ -8,10 +8,11 @@ coverage:
           - "src/*"
     patch:
       default:
-        target: 95% #
+        target: 95%
         threshold: 1%
         paths:
-          - "src/*" # Define the paths to include in the patch status
+          - "src/*"
+
 parsers:
   gcov:
     branch_detection:
@@ -22,5 +23,5 @@ parsers:
 
 comment:
   layout: "reach,diff,flags,files,footer"
-  require_changes: true # Only post a comment if there are changes in coverage
-  require_base: yes # Only post a comment if the base report has coverage data
+  require_changes: true
+  require_base: yes
