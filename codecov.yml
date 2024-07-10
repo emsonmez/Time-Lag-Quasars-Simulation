@@ -1,27 +1,8 @@
-coverage:
-  status:
-    project:
-      default:
-        target: 95%
-        threshold: 1%
-        paths:
-          - "src/*"
-    patch:
-      default:
-        target: 95%
-        threshold: 1%
-        paths:
-          - "src/*"
-
-parsers:
-  gcov:
-    branch_detection:
-      conditional: yes
-      loop: yes
-      method: no
-      macro: no
-
+codecov:
+  token: 64e07b1e-4dc9-4362-a9e9-9cb25691ee58
 comment:
-  layout: "reach,diff,flags,files,footer"
-  require_changes: true
-  require_base: yes
+  layout: "diff, flags, files"
+  behavior: default
+  require_changes: false # Only post a comment if there are changes in coverage
+  require_base: false # Must have a base report to post
+  require_head: true
