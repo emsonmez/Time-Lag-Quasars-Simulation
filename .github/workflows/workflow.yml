@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.8]
+        python-version: [3.10]
 
     steps:
       - uses: actions/checkout@v4
@@ -39,6 +39,6 @@ jobs:
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v4
         env:
-          CODECOV_TOKEN: 64e07b1e-4dc9-4362-a9e9-9cb25691ee58
+          CODECOV_TOKEN: 64e07b1e-4dc9-4362-a9e9-9cb25691ee58 # Use your secret for Codecov token here
         with:
           files: ./coverage.xml

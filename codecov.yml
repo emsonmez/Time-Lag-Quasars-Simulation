@@ -1,8 +1,22 @@
 codecov:
   token: 64e07b1e-4dc9-4362-a9e9-9cb25691ee58
+  coverage:
+    status:
+      project:
+        default:
+          target: 95%
+          threshold: 1%
+          paths:
+            - "tests/*"
+      patch:
+        default:
+          target: 95%
+          threshold: 1%
+          paths:
+            - "tests/*"
 comment:
   layout: "diff, flags, files"
   behavior: default
   require_changes: false # Only post a comment if there are changes in coverage
   require_base: false # Must have a base report to post
-  require_head: true
+  require_head: true # Must have a head report to post
