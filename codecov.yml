@@ -1,7 +1,11 @@
+codecov:
+  token: 64e07b1e-4dc9-4362-a9e9-9cb25691ee58
+
 comment:
-  layout: reach,diff,flags,files,footer
-  require_base: true
-  require_changes: true
+  layout: "reach,diff,flags,files,footer"
+  require_changes: false
+  require_base: false
+  require_head: true
 
 coverage:
   status:
