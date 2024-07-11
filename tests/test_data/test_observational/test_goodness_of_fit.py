@@ -62,25 +62,25 @@ class TestGoodnessOfFit:
         # Call the method
         self.obj.fit_curve()
 
-        # Assert values for C IV asymmetrical
+        # Assert values for C IV (asymmetrical)
         assert self.obj.beta_1350 == 1.0
         assert self.obj.gamma_1350 == 2.0
         assert self.obj.beta_std_1350 == pytest.approx(np.sqrt(0.1), rel=1e-9)
         assert self.obj.gamma_std_1350 == pytest.approx(np.sqrt(0.2), rel=1e-9)
 
-        # Assert values for C IV symmetrical
+        # Assert values for C IV (symmetrical)
         assert self.obj.beta_sym_1350 == 1.1
         assert self.obj.gamma_sym_1350 == 2.1
         assert self.obj.beta_sym_std_1350 == pytest.approx(np.sqrt(0.11), rel=1e-9)
         assert self.obj.gamma_sym_std_1350 == pytest.approx(np.sqrt(0.21), rel=1e-9)
 
-        # Assert values for Mg II asymmetrical
+        # Assert values for Mg II (asymmetrical)
         assert self.obj.beta_3000 == 1.2
         assert self.obj.gamma_3000 == 2.2
         assert self.obj.beta_std_3000 == pytest.approx(np.sqrt(0.12), rel=1e-9)
         assert self.obj.gamma_std_3000 == pytest.approx(np.sqrt(0.22), rel=1e-9)
 
-        # Assert values for Mg II symmetrical
+        # Assert values for Mg II (symmetrical)
         assert self.obj.beta_sym_3000 == 1.3
         assert self.obj.gamma_sym_3000 == 2.3
         assert self.obj.beta_sym_std_3000 == pytest.approx(np.sqrt(0.13), rel=1e-9)
