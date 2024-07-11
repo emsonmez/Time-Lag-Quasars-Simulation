@@ -1,7 +1,7 @@
-from reading_data import ObsQuasarData
+from scripts.cosmological_distances import LuminosityDistanceCalculator
+from data.observational.reading_data import ObsQuasarData
 import numpy as np
 from scipy.optimize import curve_fit
-from scipy import integrate
 
 
 class GoodnessOfFit(object):
@@ -14,7 +14,7 @@ class GoodnessOfFit(object):
     def __init__(self, base_dir):
         """Initializes the GoodnessOfFit class with the base directory.
 
-        :param base_dir: Base directory of the project.
+        :param base_dir: Base directory for dynamic path construction.
         :type base_dir: str
         """
         self.data_loader = ObsQuasarData(base_dir)
@@ -22,42 +22,40 @@ class GoodnessOfFit(object):
         self.data_loader.process_civ_data()
         self.data_loader.process_mgii_data()
 
+        self.dist_calc = LuminosityDistanceCalculator(H0=70, c=299792.458, conversion_factor=3.08567758e24)
+
         self.log_L_1350_norm = self.data_loader.log_L_1350 - np.log10(1e44)
-        self.log_𝜏 = self.data_loader.log_𝜏
-        self.log_𝜏_3000 = self.data_loader.log_𝜏_3000
-
-        c = 299792.458  # speed of light; km/s
-        Om = 0.3
-        H0 = 70
-
-        def integrand(z, H0, Om):
-            Ol = 1 - Om
-            return 1 / (H0 * np.sqrt(Om * (1 + z) ** 3 + Ol))
-
-        integrand_vec = np.vectorize(integrand)
-
-        def d_L(z, Om, H0):
-            d_c, _ = integrate.quad(integrand_vec, 0, z, args=(H0, Om))
-            return (1 + z) * d_c * c
+        self.log_τ = self.data_loader.log_τ
+        self.log_τ_3000 = self.data_loader.log_τ_3000
 
         z_3000 = self.data_loader.z_3000
-        dL_3000_Mpc = np.array([d_L(z, Om, H0) for z in z_3000])
+        dL_3000_cm = self.dist_calc.d_L(z_3000, Om=0.3, Ok=0, model="lcdm")
 
-        conversion_factor = 3.08567758e24  # 1 Mpc = 3.08567758 × 10^24 cm
-        dL_3000_cm = dL_3000_Mpc * conversion_factor
-
+        # Manually calculating monochromatic luminosity for MgII quasars assuming flat lcdm
         self.log_L_3000 = self.data_loader.log_F_3000 + np.log10(4 * np.pi) + 2 * np.log10(dL_3000_cm)
         self.log_L_3000_norm = self.log_L_3000 - np.log10(1e44)
         self.log_err_L_3000 = np.sqrt(np.square(np.array(self.data_loader.σ_F3000, dtype=float)))
 
+        # Calculate symmetrized errors for both C IV and Mg II
+        self.sigma_tau_1350 = self.symmetrized_error(self.data_loader.σ_Lower, self.data_loader.σ_Upper)
+        self.sigma_tau_3000 = self.symmetrized_error(self.data_loader.σ_Lower3000, self.data_loader.σ_Upper3000)
+
+        # Calculate log-transformed errors
+        self.sigma_tau_1350_log = self.sigma_tau_1350 / (np.log(10) * self.data_loader.τ)
+        self.sigma_tau_3000_log = self.sigma_tau_3000 / (np.log(10) * self.data_loader.τ_3000)
+
         self.beta_1350 = None
-        self.gamma_1350 = None
-        self.beta_std_1350 = None
-        self.gamma_std_1350 = None
         self.beta_3000 = None
+        self.gamma_1350 = None
         self.gamma_3000 = None
-        self.beta_std_3000 = None
-        self.gamma_std_3000 = None
+        self.beta_sym_1350 = None
+        self.gamma_sym_1350 = None
+        self.beta_sym_3000 = None
+        self.gamma_sym_3000 = None
+
+    def symmetrized_error(self, lower_error, upper_error):
+        """Calculate symmetrized error for asymmetric errors."""
+        return 0.5 * ((2 * lower_error * upper_error) / (upper_error + lower_error) + np.sqrt(lower_error * upper_error))
 
     def power_law_model(self, x, beta, gamma):
         """Defines the power-law model function.
@@ -76,17 +74,29 @@ class GoodnessOfFit(object):
     def fit_curve(self):
         """Performs curve fitting using the power-law model and stores the results
         internally."""
-        # Fit C IV data
+        # Fit C IV data (asymmetrical)
         popt_1350, pcov_1350 = curve_fit(self.power_law_model, self.log_L_1350_norm, self.log_τ)
         self.beta_1350, self.gamma_1350 = popt_1350
         self.beta_std_1350 = np.sqrt(pcov_1350[0, 0])
         self.gamma_std_1350 = np.sqrt(pcov_1350[1, 1])
 
-        # Fit Mg II data
-        popt_3000, pcov_3000 = curve_fit(self.power_law_model, self.log_L_3000_norm, self.log_𝜏_3000)
+        # Fit C IV data (symmetrical)
+        popt_sym_1350, pcov_sym_1350 = curve_fit(self.power_law_model, self.log_L_1350_norm, self.log_τ, sigma=self.sigma_tau_1350_log)
+        self.beta_sym_1350, self.gamma_sym_1350 = popt_sym_1350
+        self.beta_sym_std_1350 = np.sqrt(pcov_sym_1350[0, 0])
+        self.gamma_sym_std_1350 = np.sqrt(pcov_sym_1350[1, 1])
+
+        # Fit Mg II data (asymmetrical)
+        popt_3000, pcov_3000 = curve_fit(self.power_law_model, self.log_L_3000_norm, self.log_τ_3000)
         self.beta_3000, self.gamma_3000 = popt_3000
         self.beta_std_3000 = np.sqrt(pcov_3000[0, 0])
         self.gamma_std_3000 = np.sqrt(pcov_3000[1, 1])
+
+        # Fit Mg II data (symmetrical)
+        popt_sym_3000, pcov_sym_3000 = curve_fit(self.power_law_model, self.log_L_3000_norm, self.log_τ_3000, sigma=self.sigma_tau_3000_log)
+        self.beta_sym_3000, self.gamma_sym_3000 = popt_sym_3000
+        self.beta_sym_std_3000 = np.sqrt(pcov_sym_3000[0, 0])
+        self.gamma_sym_std_3000 = np.sqrt(pcov_sym_3000[1, 1])
 
     def calculate_goodness_of_fit(self):
         """
@@ -95,27 +105,35 @@ class GoodnessOfFit(object):
         :return: Intrinsic scatter and degrees of freedom for both C IV and Mg II data.
         :rtype: dict
         """
-        # Fit the curves if not already done
+
         if self.beta_1350 is None or self.beta_3000 is None:
             self.fit_curve()
 
-        # Calculate predicted values and residuals for C IV data
+        # Calculate predicted values and residuals for C IV data (asymmetrical)
         y_pred_1350 = self.power_law_model(self.log_L_1350_norm, self.beta_1350, self.gamma_1350)
         residuals_1350 = self.log_τ - y_pred_1350
         intrinsic_scatter_1350 = np.std(residuals_1350)
-        N_1350 = len(self.log_L_1350_norm)
-        degrees_of_freedom_1350 = N_1350 - 2
 
-        # Calculate predicted values and residuals for Mg II data
+        # Calculate predicted values and residuals for C IV data (symmetrical)
+        y_pred_sym_1350 = self.power_law_model(self.log_L_1350_norm, self.beta_sym_1350, self.gamma_sym_1350)
+        residuals_sym_1350 = self.log_τ - y_pred_sym_1350
+        intrinsic_scatter_sym_1350 = np.std(residuals_sym_1350)
+
+        # Calculate predicted values and residuals for Mg II data (asymmetrical)
         y_pred_3000 = self.power_law_model(self.log_L_3000_norm, self.beta_3000, self.gamma_3000)
-        residuals_3000 = self.log_𝜏_3000 - y_pred_3000
+        residuals_3000 = self.log_τ_3000 - y_pred_3000
         intrinsic_scatter_3000 = np.std(residuals_3000)
-        N_3000 = len(self.log_L_3000_norm)
-        degrees_of_freedom_3000 = N_3000 - 2
+
+        # Calculate predicted values and residuals for Mg II data (symmetrical)
+        y_pred_sym_3000 = self.power_law_model(self.log_L_3000_norm, self.beta_sym_3000, self.gamma_sym_3000)
+        residuals_sym_3000 = self.log_τ_3000 - y_pred_sym_3000
+        intrinsic_scatter_sym_3000 = np.std(residuals_sym_3000)
 
         return {
-            "C IV": {"intrinsic_scatter": intrinsic_scatter_1350, "degrees_of_freedom": degrees_of_freedom_1350},
-            "Mg II": {"intrinsic_scatter": intrinsic_scatter_3000, "degrees_of_freedom": degrees_of_freedom_3000},
+            "C IV (asymmetrical)": {"intrinsic_scatter": intrinsic_scatter_1350},
+            "C IV (symmetrical)": {"intrinsic_scatter": intrinsic_scatter_sym_1350},
+            "Mg II (asymmetrical)": {"intrinsic_scatter": intrinsic_scatter_3000},
+            "Mg II (symmetrical)": {"intrinsic_scatter": intrinsic_scatter_sym_3000},
         }
 
     def print_results(self):
@@ -125,14 +143,22 @@ class GoodnessOfFit(object):
 
         goodness_of_fit = self.calculate_goodness_of_fit()
 
-        print("Estimated parameters and goodness of fit for quasar dataset (C IV):")
+        print("\nEstimated parameters and goodness of fit for quasar dataset (C IV, asymmetrical):")
         print("beta = {:.2f} +/- {:.2f}".format(self.beta_1350, self.beta_std_1350))
         print("gamma = {:.2f} +/- {:.2f}".format(self.gamma_1350, self.gamma_std_1350))
-        print("Intrinsic scatter = {:.2f}".format(goodness_of_fit["C IV"]["intrinsic_scatter"]))
-        print("Degrees of freedom = {}".format(goodness_of_fit["C IV"]["degrees_of_freedom"]))
+        print("Intrinsic scatter = {:.2f}".format(goodness_of_fit["C IV (asymmetrical)"]["intrinsic_scatter"]))
 
-        print("\nEstimated parameters and goodness of fit for quasar dataset (Mg II):")
+        print("\nEstimated parameters and goodness of fit for quasar dataset (C IV, symmetrical):")
+        print("beta = {:.2f} +/- {:.2f}".format(self.beta_sym_1350, self.beta_sym_std_1350))
+        print("gamma = {:.2f} +/- {:.2f}".format(self.gamma_sym_1350, self.gamma_sym_std_1350))
+        print("Intrinsic scatter = {:.2f}".format(goodness_of_fit["C IV (symmetrical)"]["intrinsic_scatter"]))
+
+        print("\nEstimated parameters and goodness of fit for quasar dataset (Mg II, asymmetrical):")
         print("beta = {:.2f} +/- {:.2f}".format(self.beta_3000, self.beta_std_3000))
         print("gamma = {:.2f} +/- {:.2f}".format(self.gamma_3000, self.gamma_std_3000))
-        print("Intrinsic scatter = {:.2f}".format(goodness_of_fit["Mg II"]["intrinsic_scatter"]))
-        print("Degrees of freedom = {}".format(goodness_of_fit["Mg II"]["degrees_of_freedom"]))
+        print("Intrinsic scatter = {:.2f}".format(goodness_of_fit["Mg II (asymmetrical)"]["intrinsic_scatter"]))
+
+        print("\nEstimated parameters and goodness of fit for quasar dataset (Mg II, symmetrical):")
+        print("beta = {:.2f} +/- {:.2f}".format(self.beta_sym_3000, self.beta_sym_std_3000))
+        print("gamma = {:.2f} +/- {:.2f}".format(self.gamma_sym_3000, self.gamma_sym_std_3000))
+        print("Intrinsic scatter = {:.2f}".format(goodness_of_fit["Mg II (symmetrical)"]["intrinsic_scatter"]))
