@@ -39,10 +39,12 @@ class GoodnessOfFit(object):
         # Calculate symmetrized errors for both C IV and Mg II
         self.sigma_tau_1350 = self.symmetrized_error(self.data_loader.σ_Lower, self.data_loader.σ_Upper)
         self.sigma_tau_3000 = self.symmetrized_error(self.data_loader.σ_Lower3000, self.data_loader.σ_Upper3000)
-
-        # Calculate log-transformed errors
         self.sigma_tau_1350_log = self.sigma_tau_1350 / (np.log(10) * self.data_loader.τ)
         self.sigma_tau_3000_log = self.sigma_tau_3000 / (np.log(10) * self.data_loader.τ_3000)
+
+        # Calculate the asymmetric time-delay errors for C IV and Mg II
+        self.fit_curve()
+        self.calculate_asymmetric_errors()
 
         self.beta_1350 = None
         self.beta_3000 = None
@@ -97,6 +99,18 @@ class GoodnessOfFit(object):
         self.beta_sym_3000, self.gamma_sym_3000 = popt_sym_3000
         self.beta_sym_std_3000 = np.sqrt(pcov_sym_3000[0, 0])
         self.gamma_sym_std_3000 = np.sqrt(pcov_sym_3000[1, 1])
+
+    def calculate_asymmetric_errors(self):
+        """Calculates the asymmetric time-delay errors for C IV and Mg II and converts
+        them to log(τ) errors."""
+        y_pred_1350 = self.power_law_model(self.log_L_1350_norm, self.beta_1350, self.gamma_1350)
+        y_pred_3000 = self.power_law_model(self.log_L_3000_norm, self.beta_3000, self.gamma_3000)
+
+        # Calculate the asymmetric time-delay errors for C IV and Mg II
+        self.sigma_tau_1350_asym = np.where(self.log_τ < y_pred_1350, self.data_loader.σ_Lower, self.data_loader.σ_Upper)
+        self.sigma_tau_3000_asym = np.where(self.log_τ_3000 < y_pred_3000, self.data_loader.σ_Lower3000, self.data_loader.σ_Upper3000)
+        self.sigma_tau_1350_log_asym = self.sigma_tau_1350_asym / (np.log(10) * self.data_loader.τ)
+        self.sigma_tau_3000_log_asum = self.sigma_tau_3000_asym / (np.log(10) * self.data_loader.τ_3000)
 
     def calculate_goodness_of_fit(self):
         """
