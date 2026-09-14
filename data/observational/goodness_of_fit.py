@@ -1,10 +1,11 @@
-from scripts.cosmological_distances import LuminosityDistanceCalculator
-from data.observational.reading_data import ObsQuasarData
 import numpy as np
 from scipy.optimize import curve_fit
 
+from data.observational.reading_data import ObsQuasarData
+from scripts.cosmological_distances import LuminosityDistanceCalculator
 
-class GoodnessOfFit(object):
+
+class GoodnessOfFit:
     """A class to perform goodness-of-fit analysis for quasar observational data.
 
     :param base_dir: Base directory of the project.
@@ -156,21 +157,21 @@ class GoodnessOfFit(object):
         goodness_of_fit = self.calculate_goodness_of_fit()
 
         print("\nEstimated parameters and goodness of fit for quasar dataset (C IV, asymmetrical):")
-        print("beta = {:.2f} +/- {:.2f}".format(self.beta_1350, self.beta_std_1350))
-        print("gamma = {:.2f} +/- {:.2f}".format(self.gamma_1350, self.gamma_std_1350))
+        print(f"beta = {self.beta_1350:.2f} +/- {self.beta_std_1350:.2f}")
+        print(f"gamma = {self.gamma_1350:.2f} +/- {self.gamma_std_1350:.2f}")
         print("Intrinsic scatter = {:.2f}".format(goodness_of_fit["C IV (asymmetrical)"]["intrinsic_scatter"]))
 
         print("\nEstimated parameters and goodness of fit for quasar dataset (C IV, symmetrical):")
-        print("beta = {:.2f} +/- {:.2f}".format(self.beta_sym_1350, self.beta_sym_std_1350))
-        print("gamma = {:.2f} +/- {:.2f}".format(self.gamma_sym_1350, self.gamma_sym_std_1350))
+        print(f"beta = {self.beta_sym_1350:.2f} +/- {self.beta_sym_std_1350:.2f}")
+        print(f"gamma = {self.gamma_sym_1350:.2f} +/- {self.gamma_sym_std_1350:.2f}")
         print("Intrinsic scatter = {:.2f}".format(goodness_of_fit["C IV (symmetrical)"]["intrinsic_scatter"]))
 
         print("\nEstimated parameters and goodness of fit for quasar dataset (Mg II, asymmetrical):")
-        print("beta = {:.2f} +/- {:.2f}".format(self.beta_3000, self.beta_std_3000))
-        print("gamma = {:.2f} +/- {:.2f}".format(self.gamma_3000, self.gamma_std_3000))
+        print(f"beta = {self.beta_3000:.2f} +/- {self.beta_std_3000:.2f}")
+        print(f"gamma = {self.gamma_3000:.2f} +/- {self.gamma_std_3000:.2f}")
         print("Intrinsic scatter = {:.2f}".format(goodness_of_fit["Mg II (asymmetrical)"]["intrinsic_scatter"]))
 
         print("\nEstimated parameters and goodness of fit for quasar dataset (Mg II, symmetrical):")
-        print("beta = {:.2f} +/- {:.2f}".format(self.beta_sym_3000, self.beta_sym_std_3000))
-        print("gamma = {:.2f} +/- {:.2f}".format(self.gamma_sym_3000, self.gamma_sym_std_3000))
+        print(f"beta = {self.beta_sym_3000:.2f} +/- {self.beta_sym_std_3000:.2f}")
+        print(f"gamma = {self.gamma_sym_3000:.2f} +/- {self.gamma_sym_std_3000:.2f}")
         print("Intrinsic scatter = {:.2f}".format(goodness_of_fit["Mg II (symmetrical)"]["intrinsic_scatter"]))

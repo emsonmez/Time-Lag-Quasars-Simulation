@@ -1,9 +1,11 @@
-from data.observational.reading_data import ObsQuasarData
-import numpy as np
 import os
-from unittest.mock import patch
 from io import StringIO
+from unittest.mock import patch
+
+import numpy as np
 import pytest
+
+from data.observational.reading_data import ObsQuasarData
 
 
 class TestObsQuasarData:

@@ -1,6 +1,7 @@
-from scripts.cosmological_distances import LuminosityDistanceCalculator
 import numpy as np
 import pytest
+
+from scripts.cosmological_distances import LuminosityDistanceCalculator
 
 
 class TestLuminosityDistanceCalculator:

@@ -1,11 +1,12 @@
-from data.observational.goodness_of_fit import GoodnessOfFit
-from data.observational.reading_data import ObsQuasarData
-from scripts.cosmological_distances import LuminosityDistanceCalculator
 import numpy as np
 from scipy.optimize import differential_evolution
 
+from data.observational.goodness_of_fit import GoodnessOfFit
+from data.observational.reading_data import ObsQuasarData
+from scripts.cosmological_distances import LuminosityDistanceCalculator
 
-class CIVasymMCMC(object):
+
+class CIVasymMCMC:
     """A class to perform MCMC analysis for a flat Lambda-CDM model assuming
     asymmetrical errors.
 
@@ -116,14 +117,14 @@ class CIVasymMCMC(object):
         LF_max = -result.fun  # The negative log-likelihood is minimized, so flip the sign
 
         chi_squared = -2 * LF_max
-        print("Chi-squared value (-2ln(LF_max)): {:.2f}".format(chi_squared))
+        print(f"Chi-squared value (-2ln(LF_max)): {chi_squared:.2f}")
 
         beta_fit, gamma_fit, intrinsic_scatter_fit, Om_fit = params_max_likelihood
         print("Maximum likelihood estimates:")
-        print("β = {0:.3f}".format(beta_fit))
-        print("γ = {0:.3f}".format(gamma_fit))
-        print("σ_int = {0:.3f}".format(intrinsic_scatter_fit))
-        print("Ω_M = {0:.3f}".format(Om_fit))
+        print(f"β = {beta_fit:.3f}")
+        print(f"γ = {gamma_fit:.3f}")
+        print(f"σ_int = {intrinsic_scatter_fit:.3f}")
+        print(f"Ω_M = {Om_fit:.3f}")
 
         return params_max_likelihood, chi_squared
 
