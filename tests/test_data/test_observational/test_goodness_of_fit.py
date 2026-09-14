@@ -1,9 +1,11 @@
-from data.observational.goodness_of_fit import GoodnessOfFit
-import numpy as np
-from unittest.mock import patch
 import io
 import sys
+from unittest.mock import patch
+
+import numpy as np
 import pytest
+
+from data.observational.goodness_of_fit import GoodnessOfFit
 
 
 class TestGoodnessOfFit:
@@ -11,7 +13,7 @@ class TestGoodnessOfFit:
 
     def setup_method(self):
         """Setup method to initialize the ObsQuasarData class."""
-        self.base_dir = "data\observational\goodness_of_fit.py"
+        self.base_dir = r"data\observational\goodness_of_fit.py"
         self.obj = GoodnessOfFit(self.base_dir)
         self.obj.fit_curve()
 

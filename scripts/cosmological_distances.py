@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class LuminosityDistanceCalculator(object):
+class LuminosityDistanceCalculator:
     """A class to perform all necessary cosmological distances formulas, taking into
     account all models."""
 
